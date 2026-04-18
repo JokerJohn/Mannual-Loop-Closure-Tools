@@ -25,12 +25,10 @@ This repository packages the manual loop-closure workflow into a standalone open
 
 - a PyQt GUI for trajectory inspection and point-cloud-assisted loop editing
 - an offline optimizer backend for exporting new pose graphs and maps
-- bilingual documentation for installation, usage, and validation
 - helper scripts for virtual environments, backend build, environment checks, and screenshot generation
 
 - 用于轨迹检查和点云辅助闭环编辑的 PyQt 图形界面
 - 用于导出新位姿图和地图的离线优化后端
-- 中英文双语安装、使用和验证文档
 - 用于虚拟环境、后端构建、环境检查和截图生成的辅助脚本
 
 It is designed for mapping results that already contain:
@@ -51,7 +49,7 @@ It is designed for mapping results that already contain:
 ## Workflow | 工作流
 
 <p align="center">
-  <img src="assets/workflow.svg" alt="Workflow diagram" width="100%" />
+  <img src="assets/workflow.png" alt="Workflow diagram" width="100%" />
 </p>
 
 The GUI lets you inspect trajectories, select node pairs or existing loop edges, preview target/source point clouds, run GICP, add or replace loop constraints, manage a working graph session, and export a new optimized map.
@@ -81,6 +79,11 @@ source .venv/bin/activate
 make backend
 python launch_gui.py --session-root /path/to/mapping_session
 ```
+
+## Tutorial Video | 视频教程
+
+- YouTube: https://youtu.be/lemd4XfPSYY
+- YouTube 操作教程: https://youtu.be/lemd4XfPSYY
 
 You can also point directly to a `g2o` file:
 
@@ -213,21 +216,3 @@ If you use this repository in academic work, please also cite the MS-Mapping pap
 This standalone repository is released under the MIT License.
 
 本独立仓库采用 MIT License。
-
-For the related full multi-session mapping system, please also refer to the original **MS-Mapping** repository and its paper:
-
-对于相关的完整多会话建图系统，也请参考原始 **MS-Mapping** 仓库及其论文：
-
-- Project URL / 项目地址: https://github.com/JokerJohn/MS-Mapping
-
-```bibtex
-@misc{hu2024msmapping,
-      title={MS-Mapping: An Uncertainty-Aware Large-Scale Multi-Session LiDAR Mapping System},
-      author={Xiangcheng Hu, Jin Wu, Jianhao Jiao, Binqian Jiang, Wei Zhang, Wenshuo Wang and Ping Tan},
-      year={2024},
-      eprint={2408.03723},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2408.03723},
-}
-```
