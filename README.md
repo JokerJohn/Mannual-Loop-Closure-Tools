@@ -14,7 +14,10 @@
 </p>
 
 <p align="center">
-  <strong>Authors</strong>: Xiangcheng HU, Jin Wu and Xieyaunli Chen<br/>
+  <strong>Authors</strong>:
+  <a href="https://github.com/JokerJohn">Xiangcheng HU</a>,
+  <a href="https://github.com/zarathustr">Jin Wu</a> and
+  <a href="https://github.com/Chen-Xieyuanli">Xieyuanli Chen</a><br/>
   <strong>Contact</strong>: <a href="mailto:xhbd@connect.ust.hk">xhbd@connect.ust.hk</a>
 </p>
 

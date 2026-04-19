@@ -6,7 +6,7 @@ This wiki is designed as a practical operator guide for the standalone manual lo
 
 本 Wiki 面向实际使用者，重点介绍独立手动闭环工具的操作流程、图编辑逻辑、优化后端行为和常见问题。
 
-**Authors**: Xiangcheng HU, Jin Wu and Xieyaunli Chen  
+**Authors**: [Xiangcheng HU](https://github.com/JokerJohn), [Jin Wu](https://github.com/zarathustr) and [Xieyuanli Chen](https://github.com/Chen-Xieyuanli)  
 **Contact**: [xhbd@connect.ust.hk](mailto:xhbd@connect.ust.hk)
 
 <p align="center">

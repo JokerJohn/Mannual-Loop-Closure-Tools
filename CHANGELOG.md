@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - Enlarged the main README screenshot and switched feature demos from a three-column layout to full-width single-column sections for clearer viewing.
 - Updated the wiki content so it can be published directly to GitHub Wiki with sidebar navigation and GitHub-safe asset links.
 - Added a prominent author/contact block to the README header.
+- Linked the author names in the README header to their GitHub profiles and corrected the `Xieyuanli Chen` spelling.
 
 ### Validated
 
