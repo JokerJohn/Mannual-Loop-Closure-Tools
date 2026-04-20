@@ -107,20 +107,47 @@
 
 ## 快速开始
 
-### 推荐方式：`requirements.txt` + `.venv`
+### 最快方式：Docker
+
+```bash
+cd ~/my_git/Mannual-Loop-Closure-Tools
+make docker-build
+xhost +local:docker
+docker run --rm -it \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v /path/to/mapping_session:/data/session \
+  manual-loop-closure-tools:latest \
+  python launch_gui.py --session-root /data/session
+```
+
+面向首次使用者的 Docker FAQ：
+
+- 先执行显示权限放通：`xhost +local:docker`
+- 把宿主机 session 目录挂载到 `/data/session`
+- 导出的结果会直接保存在宿主机的 `manual_loop_runs/`
+- 无图形界面环境可以直接使用 Python 优化器 CLI
+- 详细说明见：[docs/DOCKER.md](docs/DOCKER.md)
+
+### 推荐本地方式：`requirements.txt` + `.venv`
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
 make venv
 source .venv/bin/activate
+make gtsam-python
 python launch_gui.py --session-root /path/to/mapping_session
 ```
 
 对于大多数用户，到这里就够了。ROS、catkin 和 legacy C++ optimizer 都是可选项。
 
-Python GTSAM 4.3 wrapper 的安装说明见：
+Python GTSAM 4.3 wrapper 现在可以通过仓库辅助脚本一键安装：
 
-- [docs/INSTALL_GTSAM_PYTHON.md](docs/INSTALL_GTSAM_PYTHON.md)
+- `make gtsam-python`
+- 或 `bash scripts/install_gtsam_python.sh`
+- 详细说明见：[docs/INSTALL_GTSAM_PYTHON.md](docs/INSTALL_GTSAM_PYTHON.md)
 
 也可以直接指定某个 `g2o` 文件：
 
@@ -137,16 +164,26 @@ conda activate manual-loop-closure
 python launch_gui.py --session-root /path/to/mapping_session
 ```
 
-## Legacy C++ 回退后端
+## Python 优先优化后端
 
-GUI 默认使用 Python backend。C++ optimizer 仅保留为可选 fallback 和 parity 对照路径：
+在重新审查位姿图优化链路并与当前 C++ 实现对照后，本仓库已经把 Python backend 作为当前验证过的手动闭环工作流的正常主路径。
+
+legacy C++ optimizer 现在仅保留为：
+
+- 开发者回退路径
+- parity 对照参考
+- 回归基线路径
+
+普通安装和 GUI 使用都不再依赖它。
+
+如果你仍然需要本地编译 legacy backend：
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
 make backend
 ```
 
-如果没有安装 C++ backend，GUI 仍可通过 Python 路径正常工作。
+默认情况下，GUI 现在只突出 Python-first 路径；legacy C++ 选择器仅在开发者显式开启时显示。
 
 ## 测试数据
 
@@ -204,6 +241,7 @@ Mannual-Loop-Closure-Tools/
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
+├── Dockerfile
 ├── requirements.txt
 ├── environment.yml
 ├── launch_gui.py
@@ -224,6 +262,7 @@ Mannual-Loop-Closure-Tools/
 - [English README](README.md)
 - [安装说明](docs/INSTALL.md)
 - [Python GTSAM 4.3 安装](docs/INSTALL_GTSAM_PYTHON.md)
+- [Docker 使用说明](docs/DOCKER.md)
 - [工具说明](docs/TOOL_README.md)
 - [GitHub Wiki](https://github.com/JokerJohn/Mannual-Loop-Closure-Tools/wiki)
 - [贡献说明](CONTRIBUTING.md)
@@ -233,9 +272,11 @@ Mannual-Loop-Closure-Tools/
 
 ```bash
 make help
+make gtsam-python
 make check
 make env-check
 make optimizer-help
+make docker-build
 make backend
 make assets SESSION_ROOT=/path/to/session
 ```

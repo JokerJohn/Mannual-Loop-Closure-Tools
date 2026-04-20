@@ -12,6 +12,22 @@ If this Python wrapper is installed, you can use the GUI normally without ROS, c
 
 ## Recommended Build Path | 推荐构建路径
 
+### Short Version | 简化版本
+
+If the repository virtual environment already exists, the recommended path is now:
+
+如果仓库虚拟环境已经创建好，现在推荐直接执行：
+
+```bash
+cd ~/my_git/Mannual-Loop-Closure-Tools
+source .venv/bin/activate
+make gtsam-python
+```
+
+This runs the repository helper script and installs the wrapper into the active virtual environment.
+
+这会调用仓库自带的辅助脚本，并把 wrapper 安装进当前激活的虚拟环境。
+
 ### 1. Install build prerequisites | 安装编译依赖
 
 ```bash
@@ -29,10 +45,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip setuptools wheel
 pip install -r requirements.txt
-pip install pybind11-stubgen
 ```
 
 ### 3. Build GTSAM 4.3 Python wrappers from source | 从源码构建 GTSAM 4.3 Python wrappers
+
+This is the sequence automated by `make gtsam-python`.
+
+这也是 `make gtsam-python` 在内部自动执行的核心流程。
 
 ```bash
 cd ~/third_party
@@ -90,6 +109,14 @@ python launch_gui.py --help
 The GUI now defaults to the Python backend. If Python optimization fails at runtime and a legacy C++ binary is available, it can still fall back automatically.
 
 GUI 现在默认使用 Python backend。若运行时 Python 优化失败且本地存在 legacy C++ 二进制，仍可自动回退。
+
+The normal GUI path now hides the legacy C++ selector. If a developer really wants to expose it for debugging, set:
+
+默认 GUI 已隐藏 legacy C++ 选择器。如果开发者确实需要把它显示出来做调试，可以设置：
+
+```bash
+export MLCT_SHOW_LEGACY_CPP_BACKEND=1
+```
 
 You can override the preference with:
 

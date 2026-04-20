@@ -107,20 +107,47 @@ Temporarily disable an existing loop edge before re-optimization.
 
 ## Quick Start
 
-### Recommended path: `requirements.txt` + `.venv`
+### Fastest path: Docker
+
+```bash
+cd ~/my_git/Mannual-Loop-Closure-Tools
+make docker-build
+xhost +local:docker
+docker run --rm -it \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v /path/to/mapping_session:/data/session \
+  manual-loop-closure-tools:latest \
+  python launch_gui.py --session-root /data/session
+```
+
+Docker FAQ for first-time users:
+
+- Need a display permission first: `xhost +local:docker`
+- Mount your host session to `/data/session`
+- All exported outputs stay on the host under `manual_loop_runs/`
+- Headless usage is supported through the Python optimizer CLI
+- Full details: [docs/DOCKER.md](docs/DOCKER.md)
+
+### Recommended local path: `requirements.txt` + `.venv`
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
 make venv
 source .venv/bin/activate
+make gtsam-python
 python launch_gui.py --session-root /path/to/mapping_session
 ```
 
 For normal use, you can stop here. ROS, catkin, and the legacy C++ optimizer are optional.
 
-Python GTSAM 4.3 wrapper installation is documented here:
+The Python GTSAM 4.3 wrapper now has a repository helper path:
 
-- [docs/INSTALL_GTSAM_PYTHON.md](docs/INSTALL_GTSAM_PYTHON.md)
+- `make gtsam-python`
+- or `bash scripts/install_gtsam_python.sh`
+- details: [docs/INSTALL_GTSAM_PYTHON.md](docs/INSTALL_GTSAM_PYTHON.md)
 
 You can also point directly to a `g2o` file:
 
@@ -137,16 +164,26 @@ conda activate manual-loop-closure
 python launch_gui.py --session-root /path/to/mapping_session
 ```
 
-## Legacy C++ Fallback Backend
+## Python-First Optimizer Path
 
-The GUI now defaults to the Python backend. The C++ optimizer is only kept as an optional fallback and parity reference:
+After reviewing the pose-graph optimization path against the current C++ implementation, this repository now treats the Python backend as the normal runtime path for the validated manual loop-closure workflow.
+
+The legacy C++ optimizer is retained only as:
+
+- a developer fallback
+- a parity reference
+- a regression benchmark path
+
+It is no longer required for normal installation or GUI usage.
+
+If you still want the legacy backend locally:
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
 make backend
 ```
 
-If the C++ backend is not installed, the GUI still works normally with the Python path.
+By default, the GUI now exposes only the Python-first path. The legacy C++ selector stays hidden unless a developer explicitly enables it.
 
 ## Test Data
 
@@ -204,6 +241,7 @@ Mannual-Loop-Closure-Tools/
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
+├── Dockerfile
 ├── requirements.txt
 ├── environment.yml
 ├── launch_gui.py
@@ -224,6 +262,7 @@ Mannual-Loop-Closure-Tools/
 - [中文 README](README.zh.md)
 - [Installation Guide](docs/INSTALL.md)
 - [Python GTSAM 4.3](docs/INSTALL_GTSAM_PYTHON.md)
+- [Docker Guide](docs/DOCKER.md)
 - [Tool Manual](docs/TOOL_README.md)
 - [GitHub Wiki](https://github.com/JokerJohn/Mannual-Loop-Closure-Tools/wiki)
 - [Contributing](CONTRIBUTING.md)
@@ -233,9 +272,11 @@ Mannual-Loop-Closure-Tools/
 
 ```bash
 make help
+make gtsam-python
 make check
 make env-check
 make optimizer-help
+make docker-build
 make backend
 make assets SESSION_ROOT=/path/to/session
 ```

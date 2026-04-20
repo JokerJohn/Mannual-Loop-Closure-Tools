@@ -75,6 +75,8 @@ def main() -> int:
     print(f"  python optimizer cli: {first_existing([optimizer_candidates[0]])}")
     print(f"  legacy optimizer binary (optional): {first_existing(optimizer_candidates[1:])}")
     print("  build command (optional): bash scripts/build_backend_catkin.sh")
+    print("  gtsam wrapper helper:   bash scripts/install_gtsam_python.sh")
+    print("  docker image (optional): docker build -t manual-loop-closure-tools:latest .")
     print("  GUI launch:    python launch_gui.py --session-root /path/to/session")
     print("  note:          Python GTSAM is the normal path. ROS/catkin/C++ are optional.")
     return 0

@@ -1,0 +1,13 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.swp
+paper
+backend/catkin_ws/build
+backend/catkin_ws/devel
+backend/catkin_ws/install
+.cache
+tmp

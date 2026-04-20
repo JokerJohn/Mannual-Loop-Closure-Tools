@@ -32,6 +32,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Compressed the homepage hero card again by renaming `Graph Changes` to `Graph Ops` and shortening the export call-to-action.
+- Hid the legacy C++ backend selector from the normal GUI path and kept it only for explicit developer mode while preserving automatic fallback behavior.
+- Added a one-command `make gtsam-python` / `scripts/install_gtsam_python.sh` path for installing the GTSAM 4.3 Python wrapper into the active virtual environment.
+- Added first-party Docker support with a repository `Dockerfile`, `.dockerignore`, and `docs/DOCKER.md`.
+- Updated installation docs and both README variants to emphasize Docker and Python-first setup while keeping the C++ backend as a developer-only reference path.
 - Made the standalone GUI Python-first by default while keeping the legacy C++ optimizer as an optional fallback path.
 - Added validated Python/C++ parity reporting for multiple sessions and documented the observed pose, graph, map-point, and runtime differences.
 - Refined the trajectory panel to emphasize `Nodes` / `Edges` selection, reduce status-badge prominence, and compact the toolbar and control rows.
@@ -48,6 +53,7 @@ All notable changes to this project will be documented in this file.
 - Reworked the GitHub Wiki content into English-first pages with matching Chinese switch pages instead of line-by-line bilingual mixing.
 - Simplified the hero banner and tutorial card visuals to avoid text overflow on the homepage assets.
 - Updated the contact email to `xhubd@connect.ust.hk`.
+- Added a beginner-friendly Docker FAQ and linked it directly from both README quick-start sections.
 
 ### Validated
 

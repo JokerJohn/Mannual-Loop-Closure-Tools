@@ -52,10 +52,10 @@
   <text x="1018" y="269" fill="#334155" font-family="Arial, sans-serif" font-size="14">Run GICP or Auto Yaw</text>
 
   <rect x="792" y="328" width="386" height="96" rx="18" fill="#F8FAFC" stroke="#CBD5E1"/>
-  <text x="818" y="361" fill="#0F172A" font-family="Arial, sans-serif" font-size="18" font-weight="700">Graph Changes</text>
-  <text x="818" y="387" fill="#475569" font-family="Arial, sans-serif" font-size="15">Track edits, replace weak loops,</text>
-  <text x="818" y="409" fill="#475569" font-family="Arial, sans-serif" font-size="15">undo changes, and optimize.</text>
+  <text x="818" y="361" fill="#0F172A" font-family="Arial, sans-serif" font-size="18" font-weight="700">Graph Ops</text>
+  <text x="818" y="387" fill="#475569" font-family="Arial, sans-serif" font-size="15">Track changes, replace weak loops,</text>
+  <text x="818" y="409" fill="#475569" font-family="Arial, sans-serif" font-size="15">undo edits, and optimize.</text>
 
   <rect x="792" y="446" width="386" height="72" rx="18" fill="url(#accent)"/>
-  <text x="818" y="488" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="800">Export clean working results</text>
+  <text x="818" y="488" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="800">Export Results</text>
 </svg>

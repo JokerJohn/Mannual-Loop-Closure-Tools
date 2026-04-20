@@ -637,6 +637,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self._pending_optimizer_options: Optional[OptimizerRunOptions] = None
         self._selected_optimizer_preference = BACKEND_PREFERENCE_PYTHON
         self._cpp_optimizer_command_cache: Optional[list[str]] = None
+        self._show_legacy_backend_controls = False
 
         self._preview_timer = QtCore.QTimer(self)
         self._preview_timer.setSingleShot(True)
@@ -1612,28 +1613,37 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         advanced_layout_grid.addWidget(self.export_map_voxel_spin, 3, 1)
 
         self._cpp_optimizer_command_cache = self._resolve_cpp_optimizer_command()
-        self.optimizer_backend_combo = QtWidgets.QComboBox()
-        self.optimizer_backend_combo.addItem("Python", BACKEND_PREFERENCE_PYTHON)
-        if self._cpp_optimizer_command_cache is not None:
-            self.optimizer_backend_combo.addItem("C++", BACKEND_PREFERENCE_CPP)
-        backend_preference = os.environ.get(
-            "MANUAL_LOOP_OPTIMIZER_BACKEND",
-            BACKEND_PREFERENCE_PYTHON,
-        ).lower()
-        backend_index = {
-            BACKEND_PREFERENCE_PYTHON: 0,
-            BACKEND_PREFERENCE_CPP: 1 if self._cpp_optimizer_command_cache is not None else 0,
-        }.get(backend_preference, 0)
-        self.optimizer_backend_combo.setCurrentIndex(backend_index)
+        self._show_legacy_backend_controls = (
+            self._cpp_optimizer_command_cache is not None
+            and os.environ.get("MLCT_SHOW_LEGACY_CPP_BACKEND", "").strip().lower() in {"1", "true", "yes"}
+        )
         backend_label = QtWidgets.QLabel("Backend")
         backend_label.setObjectName("SubtleText")
         advanced_layout_grid.addWidget(backend_label, 4, 0)
-        advanced_layout_grid.addWidget(self.optimizer_backend_combo, 4, 1)
-        backend_hint = QtWidgets.QLabel(
-            "C++ backend optional: safe to skip if you only use the Python workflow."
-            if self._cpp_optimizer_command_cache is not None
-            else "C++ backend not detected. Python-only usage works normally."
-        )
+        if self._show_legacy_backend_controls:
+            self.optimizer_backend_combo = QtWidgets.QComboBox()
+            self.optimizer_backend_combo.addItem("Python", BACKEND_PREFERENCE_PYTHON)
+            self.optimizer_backend_combo.addItem("C++", BACKEND_PREFERENCE_CPP)
+            backend_preference = os.environ.get(
+                "MANUAL_LOOP_OPTIMIZER_BACKEND",
+                BACKEND_PREFERENCE_PYTHON,
+            ).lower()
+            backend_index = {
+                BACKEND_PREFERENCE_PYTHON: 0,
+                BACKEND_PREFERENCE_CPP: 1,
+            }.get(backend_preference, 0)
+            self.optimizer_backend_combo.setCurrentIndex(backend_index)
+            advanced_layout_grid.addWidget(self.optimizer_backend_combo, 4, 1)
+            backend_hint = QtWidgets.QLabel(
+                "Developer mode: legacy C++ backend selector is visible."
+            )
+        else:
+            self.optimizer_backend_label = QtWidgets.QLabel("Python")
+            self.optimizer_backend_label.setObjectName("SubtleText")
+            advanced_layout_grid.addWidget(self.optimizer_backend_label, 4, 1)
+            backend_hint = QtWidgets.QLabel(
+                "Python-first path. Legacy C++ stays hidden and is only used as an automatic fallback when available."
+            )
         backend_hint.setObjectName("SubtleText")
         backend_hint.setWordWrap(True)
         advanced_layout_grid.addWidget(backend_hint, 5, 0, 1, 2)
@@ -3695,7 +3705,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         preference = str(
             self.optimizer_backend_combo.currentData()
             if hasattr(self, "optimizer_backend_combo")
-            else BACKEND_PREFERENCE_PYTHON
+            else os.environ.get("MANUAL_LOOP_OPTIMIZER_BACKEND", BACKEND_PREFERENCE_PYTHON).lower()
         )
         python_backend = resolve_python_optimizer_backend(
             script_dir=SCRIPT_DIR,
@@ -3791,7 +3801,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self._selected_optimizer_preference = str(
             self.optimizer_backend_combo.currentData()
             if hasattr(self, "optimizer_backend_combo")
-            else BACKEND_PREFERENCE_PYTHON
+            else os.environ.get("MANUAL_LOOP_OPTIMIZER_BACKEND", BACKEND_PREFERENCE_PYTHON).lower()
         )
         backend = self._resolve_optimizer_backend()
         if backend is None:

@@ -56,7 +56,40 @@ What the script installs:
 - system libraries: `libpcl-dev`, `libopencv-dev`, `libboost-all-dev`, `libgeographic-dev`, `libzstd-dev`
 - utilities: `python3-pip`, `python3-venv`, `python3-catkin-tools`
 
-## 3. Create the Python Environment | 3. 创建 Python 环境
+## 3. Fastest Path: Docker | 3. 最快路径：Docker
+
+If you want the most reproducible setup with the fewest host-side dependency issues, use Docker.
+
+如果你希望尽量避免宿主机环境问题，Docker 是最省事的方式。
+
+```bash
+cd ~/my_git/Mannual-Loop-Closure-Tools
+docker build -t manual-loop-closure-tools:latest .
+```
+
+For GUI usage with X11:
+
+图形界面可以这样启动：
+
+```bash
+xhost +local:docker
+docker run --rm -it \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v /path/to/mapping_session:/data/session \
+  manual-loop-closure-tools:latest \
+  python launch_gui.py --session-root /data/session
+```
+
+More details:
+
+更多细节：
+
+- [DOCKER.md](DOCKER.md)
+
+## 4. Create the Python Environment | 4. 创建 Python 环境
 
 Recommended default path:
 
@@ -91,19 +124,35 @@ conda env create -f environment.yml
 conda activate manual-loop-closure
 ```
 
-## 4. Install Python GTSAM 4.3 | 4. 安装 Python GTSAM 4.3
+## 5. Install Python GTSAM 4.3 | 5. 安装 Python GTSAM 4.3
 
 The Python optimizer is designed to match the current C++ backend semantics and was tested against the `GTSAM 4.3` line.
 
 Python 优化器按当前 C++ backend 语义对齐设计，并以 `GTSAM 4.3` 线为目标进行了测试。
 
-Use the dedicated installation notes here:
+Recommended helper path:
+
+推荐的一键方式：
+
+```bash
+make gtsam-python
+```
+
+Or:
+
+或者：
+
+```bash
+bash scripts/install_gtsam_python.sh
+```
+
+Dedicated installation notes:
 
 请参考这里的专用安装说明：
 
 - [INSTALL_GTSAM_PYTHON.md](INSTALL_GTSAM_PYTHON.md)
 
-## 5. Launch the GUI (Python-first path) | 5. 启动 GUI（Python 主路径）
+## 6. Launch the GUI (Python-first path) | 6. 启动 GUI（Python 主路径）
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
@@ -119,7 +168,7 @@ Or:
 python launch_gui.py --g2o /path/to/pose_graph.g2o
 ```
 
-## 6. Optional: Build the Legacy C++ Backend | 6. 可选：编译 Legacy C++ Backend
+## 7. Optional: Build the Legacy C++ Backend | 7. 可选：编译 Legacy C++ Backend
 
 ```bash
 cd ~/my_git/Mannual-Loop-Closure-Tools
@@ -145,7 +194,7 @@ Expected binary path after a successful build:
 backend/catkin_ws/devel/lib/manual_loop_closure_backend/manual_loop_optimize
 ```
 
-## 7. Verify the Environment | 7. 检查环境
+## 8. Verify the Environment | 8. 检查环境
 
 ```bash
 make env-check
@@ -155,7 +204,7 @@ This script prints Python package versions, Python GTSAM availability, ROS / cat
 
 该脚本会打印 Python 包版本、Python GTSAM 可用性、ROS / catkin 状态、常见 GTSAM CMake 路径以及后端构建提示。
 
-## 8. Expected Input Layout | 8. 输入目录结构
+## 9. Expected Input Layout | 9. 输入目录结构
 
 ```text
 mapping_session/
@@ -205,4 +254,5 @@ export CMAKE_PREFIX_PATH=/usr/local:$CMAKE_PREFIX_PATH
 
 - [Tool Manual / 工具说明](TOOL_README.md)
 - [Python GTSAM 4.3 安装 / Python GTSAM 4.3](INSTALL_GTSAM_PYTHON.md)
+- [Docker Guide / Docker 使用说明](DOCKER.md)
 - [Project Overview / 项目总览](../README.md)

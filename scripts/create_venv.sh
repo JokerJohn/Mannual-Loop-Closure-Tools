@@ -19,5 +19,7 @@ echo
 echo "[manual-loop-closure] Virtual environment is ready."
 echo "[manual-loop-closure] Activate it with:"
 echo "  source \"$VENV_DIR/bin/activate\""
+echo "[manual-loop-closure] Install the GTSAM 4.3 Python wrapper with:"
+echo "  make gtsam-python"
 echo "[manual-loop-closure] Then launch:"
 echo "  python \"$REPO_ROOT/launch_gui.py\" --session-root /path/to/session"
