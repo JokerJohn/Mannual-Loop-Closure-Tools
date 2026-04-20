@@ -44,13 +44,12 @@ This repository packages the manual loop-closure workflow into a standalone open
 
 本仓库将手动闭环工作流整理为一个独立的开源项目，包含：
 
-- a PyQt GUI for trajectory inspection and point-cloud-assisted loop editing
-- a Python-first offline optimizer backend for exporting new pose graphs and maps
-- helper scripts for virtual environments, Python GTSAM checks, legacy backend build, environment checks, and screenshot generation
-
-- 用于轨迹检查和点云辅助闭环编辑的 PyQt 图形界面
-- 用于导出新位姿图和地图的 Python 优先离线优化后端
-- 用于虚拟环境、Python GTSAM 检查、legacy 后端构建、环境检查和截图生成的辅助脚本
+- a PyQt GUI for trajectory inspection and point-cloud-assisted loop editing  
+  用于轨迹检查和点云辅助闭环编辑的 PyQt 图形界面
+- a Python-first offline optimizer backend for exporting new pose graphs and maps  
+  用于导出新位姿图和地图的 Python 优先离线优化后端
+- helper scripts for virtual environments, Python GTSAM checks, legacy backend build, environment checks, and screenshot generation  
+  用于虚拟环境、Python GTSAM 检查、legacy 后端构建、环境检查和截图生成的辅助脚本
 
 It is designed for mapping results that already contain:
 
