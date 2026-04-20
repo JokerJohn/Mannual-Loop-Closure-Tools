@@ -1,6 +1,6 @@
 # Troubleshooting
 
-[English](Troubleshooting.md) | [中文](Troubleshooting-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)
 
 ## GUI Opens but Point Clouds Look Wrong
 

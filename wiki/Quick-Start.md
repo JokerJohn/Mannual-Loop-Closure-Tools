@@ -1,6 +1,6 @@
 # Quick Start
 
-[English](Quick-Start.md) | [中文](Quick-Start-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start-zh)
 
 ## Recommended Path
 
@@ -34,6 +34,6 @@ Your session should already contain:
 
 ## Helpful Links
 
-- [GUI Workflow](GUI-Workflow.md)
-- [Graph Editing](Graph-Editing.md)
-- [Troubleshooting](Troubleshooting.md)
+- [GUI Workflow](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow)
+- [Graph Editing](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing)
+- [Troubleshooting](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting)

@@ -1,6 +1,6 @@
 # Graph Editing
 
-[English](Graph-Editing.md) | [中文](Graph-Editing-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing-zh)
 
 ## Editing Philosophy
 

@@ -1,6 +1,6 @@
 # 快速开始
 
-[English](Quick-Start.md) | [中文](Quick-Start-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start-zh)
 
 ## 推荐路径
 
@@ -34,6 +34,6 @@ python launch_gui.py --session-root /path/to/mapping_session
 
 ## 快速链接
 
-- [GUI 工作流](GUI-Workflow-zh.md)
-- [图编辑逻辑](Graph-Editing-zh.md)
-- [常见问题排查](Troubleshooting-zh.md)
+- [GUI 工作流](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow-zh)
+- [图编辑逻辑](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing-zh)
+- [常见问题排查](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)

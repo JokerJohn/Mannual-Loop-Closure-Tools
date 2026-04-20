@@ -1,6 +1,6 @@
 # Optimization Backends
 
-[English](Optimization-Backends.md) | [中文](Optimization-Backends-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends-zh)
 
 ## Python First
 

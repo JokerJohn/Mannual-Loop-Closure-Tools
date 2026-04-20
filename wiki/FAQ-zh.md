@@ -1,6 +1,6 @@
 # FAQ
 
-[English](FAQ.md) | [中文](FAQ-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/FAQ) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/FAQ-zh)
 
 ## 正常使用需要 ROS 吗？
 
@@ -28,7 +28,7 @@ Python backend 的重点是更低的部署门槛和更自然的 GUI 集成。当
 
 建议阅读顺序：
 
-1. [快速开始](Quick-Start-zh.md)
-2. [GUI 工作流](GUI-Workflow-zh.md)
-3. [图编辑逻辑](Graph-Editing-zh.md)
-4. [常见问题排查](Troubleshooting-zh.md)
+1. [快速开始](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start-zh)
+2. [GUI 工作流](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow-zh)
+3. [图编辑逻辑](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing-zh)
+4. [常见问题排查](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)

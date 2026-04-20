@@ -1,6 +1,6 @@
 # Manual Loop Closure Tools Wiki
 
-[English](Home.md) | [中文](Home-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Home) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Home-zh)
 
 本 Wiki 是独立手动闭环工作流的实用使用手册，重点介绍工具操作、图编辑逻辑、优化后端行为和常见问题。
 
@@ -13,12 +13,12 @@
 
 ## 从这里开始
 
-- [快速开始](Quick-Start-zh.md)
-- [GUI 工作流](GUI-Workflow-zh.md)
-- [图编辑逻辑](Graph-Editing-zh.md)
-- [优化后端](Optimization-Backends-zh.md)
-- [常见问题排查](Troubleshooting-zh.md)
-- [FAQ](FAQ-zh.md)
+- [快速开始](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start-zh)
+- [GUI 工作流](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow-zh)
+- [图编辑逻辑](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing-zh)
+- [优化后端](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends-zh)
+- [常见问题排查](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)
+- [FAQ](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/FAQ-zh)
 
 ## 工具定位
 
@@ -58,11 +58,11 @@
 
 ## 建议阅读顺序
 
-1. [快速开始](Quick-Start-zh.md)
-2. [GUI 工作流](GUI-Workflow-zh.md)
-3. [图编辑逻辑](Graph-Editing-zh.md)
-4. [优化后端](Optimization-Backends-zh.md)
-5. [常见问题排查](Troubleshooting-zh.md)
+1. [快速开始](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start-zh)
+2. [GUI 工作流](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow-zh)
+3. [图编辑逻辑](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing-zh)
+4. [优化后端](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends-zh)
+5. [常见问题排查](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)
 
 ## 仓库链接
 

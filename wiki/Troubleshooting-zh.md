@@ -1,6 +1,6 @@
 # 常见问题排查
 
-[English](Troubleshooting.md) | [中文](Troubleshooting-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting-zh)
 
 ## GUI 能打开，但点云显示异常
 

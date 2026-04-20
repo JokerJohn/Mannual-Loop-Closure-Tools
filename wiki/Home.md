@@ -1,6 +1,6 @@
 # Manual Loop Closure Tools Wiki
 
-[English](Home.md) | [中文](Home-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Home) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Home-zh)
 
 This wiki is a practical operator guide for the standalone manual loop closure workflow. It complements the repository README with focused pages on usage, graph-editing logic, backend behavior, and troubleshooting.
 
@@ -13,12 +13,12 @@ This wiki is a practical operator guide for the standalone manual loop closure w
 
 ## Start Here
 
-- [Quick Start](Quick-Start.md)
-- [GUI Workflow](GUI-Workflow.md)
-- [Graph Editing](Graph-Editing.md)
-- [Optimization Backends](Optimization-Backends.md)
-- [Troubleshooting](Troubleshooting.md)
-- [FAQ](FAQ.md)
+- [Quick Start](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start)
+- [GUI Workflow](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow)
+- [Graph Editing](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing)
+- [Optimization Backends](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends)
+- [Troubleshooting](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting)
+- [FAQ](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/FAQ)
 
 ## What This Tool Does
 
@@ -58,11 +58,11 @@ It lets you:
 
 ## Suggested Reading Order
 
-1. [Quick Start](Quick-Start.md)
-2. [GUI Workflow](GUI-Workflow.md)
-3. [Graph Editing](Graph-Editing.md)
-4. [Optimization Backends](Optimization-Backends.md)
-5. [Troubleshooting](Troubleshooting.md)
+1. [Quick Start](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Quick-Start)
+2. [GUI Workflow](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow)
+3. [Graph Editing](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Graph-Editing)
+4. [Optimization Backends](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Optimization-Backends)
+5. [Troubleshooting](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/Troubleshooting)
 
 ## Repository Links
 

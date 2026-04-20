@@ -1,6 +1,6 @@
 # GUI Workflow
 
-[English](GUI-Workflow.md) | [中文](GUI-Workflow-zh.md)
+[English](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow) | [中文](https://github.com/JokerJohn/Manual-Loop-Closure-Tools/wiki/GUI-Workflow-zh)
 
 ## Main Layout
 
