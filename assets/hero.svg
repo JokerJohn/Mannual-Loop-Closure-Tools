@@ -42,14 +42,14 @@
   <text x="818" y="145" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Working Session</text>
 
   <rect x="792" y="188" width="182" height="116" rx="18" fill="#EFF6FF" stroke="#BFDBFE"/>
-  <text x="814" y="221" fill="#1D4ED8" font-family="Arial, sans-serif" font-size="18" font-weight="700">Trajectory Review</text>
-  <text x="814" y="249" fill="#334155" font-family="Arial, sans-serif" font-size="15">Pick nodes and loop edges</text>
-  <text x="814" y="272" fill="#334155" font-family="Arial, sans-serif" font-size="15">Compare Working vs Original</text>
+  <text x="814" y="221" fill="#1D4ED8" font-family="Arial, sans-serif" font-size="18" font-weight="700">Graph Edit</text>
+  <text x="814" y="248" fill="#334155" font-family="Arial, sans-serif" font-size="14">Pick nodes and weak loops</text>
+  <text x="814" y="269" fill="#334155" font-family="Arial, sans-serif" font-size="14">Review Working vs Original</text>
 
   <rect x="996" y="188" width="182" height="116" rx="18" fill="#F0FDF4" stroke="#86EFAC"/>
-  <text x="1018" y="221" fill="#15803D" font-family="Arial, sans-serif" font-size="18" font-weight="700">Cloud Alignment</text>
-  <text x="1018" y="249" fill="#334155" font-family="Arial, sans-serif" font-size="15">Preview source and target clouds</text>
-  <text x="1018" y="272" fill="#334155" font-family="Arial, sans-serif" font-size="15">Run GICP or Auto Yaw</text>
+  <text x="1018" y="221" fill="#15803D" font-family="Arial, sans-serif" font-size="18" font-weight="700">Map Alignment</text>
+  <text x="1018" y="248" fill="#334155" font-family="Arial, sans-serif" font-size="14">Align source to target map</text>
+  <text x="1018" y="269" fill="#334155" font-family="Arial, sans-serif" font-size="14">Run GICP or Auto Yaw</text>
 
   <rect x="792" y="328" width="386" height="96" rx="18" fill="#F8FAFC" stroke="#CBD5E1"/>
   <text x="818" y="361" fill="#0F172A" font-family="Arial, sans-serif" font-size="18" font-weight="700">Graph Changes</text>
