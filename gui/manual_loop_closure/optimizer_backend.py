@@ -87,16 +87,18 @@ def _supports_python_optimizer(python_executable: Path) -> bool:
 
 def _candidate_python_executables(project_root: Optional[Path]) -> list[Path]:
     candidates: list[Path] = []
-    current = Path(sys.executable).resolve()
+    current = Path(sys.executable).expanduser()
 
     def append_candidate(path: Optional[Path]) -> None:
         if path is None:
             return
-        resolved = path.expanduser().resolve()
-        if not resolved.is_file():
+        candidate = path.expanduser()
+        if not candidate.is_absolute():
+            candidate = candidate.resolve()
+        if not candidate.is_file():
             return
-        if resolved not in candidates:
-            candidates.append(resolved)
+        if candidate not in candidates:
+            candidates.append(candidate)
 
     append_candidate(Path(os.environ["MANUAL_LOOP_OPTIMIZER_PYTHON"])) if os.environ.get(
         "MANUAL_LOOP_OPTIMIZER_PYTHON"
@@ -111,6 +113,16 @@ def _candidate_python_executables(project_root: Optional[Path]) -> list[Path]:
     if project_root is not None:
         append_candidate(project_root / ".venv" / "bin" / "python3")
         append_candidate(project_root / ".venv" / "bin" / "python")
+
+    repo_root = os.environ.get("MANUAL_LOOP_CLOSURE_REPO")
+    if repo_root:
+        repo_path = Path(repo_root)
+        append_candidate(repo_path / ".venv" / "bin" / "python3")
+        append_candidate(repo_path / ".venv" / "bin" / "python")
+
+    default_standalone_repo = Path.home() / "my_git" / "Mannual-Loop-Closure-Tools"
+    append_candidate(default_standalone_repo / ".venv" / "bin" / "python3")
+    append_candidate(default_standalone_repo / ".venv" / "bin" / "python")
 
     home = Path.home()
     for base_dir in (home / "anaconda3", home / "miniconda3"):
@@ -136,8 +148,7 @@ def resolve_python_optimizer_backend(
             key=BACKEND_PREFERENCE_PYTHON,
             display_name=f"python:{candidate}",
             program=str(candidate),
-            arguments_prefix=(str(cli_script),),
+            arguments_prefix=("-u", str(cli_script)),
         )
     return None
 # ===== END CHANGE: optimizer backend adapter =====
-

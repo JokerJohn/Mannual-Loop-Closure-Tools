@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import shutil
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Optional
@@ -77,10 +78,11 @@ def _load_measurements(tum_path: Path, keyframe_dir: Path) -> list[MeasurementRe
                 "Keyframe numbering must match 0..N-1 exactly. "
                 f"Expected {expected_index}.pcd but found {path.name}"
             )
-    return [
+    measurements = [
         MeasurementRecord(index=index, odom_time=float(trajectory.timestamps[index]), cloud_path=cloud_paths[index])
         for index in range(trajectory.size)
     ]
+    return measurements
 
 
 def _parse_bool(text: str) -> bool:
@@ -164,14 +166,29 @@ def run_python_optimizer(
     options: OptimizerRunOptions,
     log_fn: LogFn = None,
 ) -> OptimizerRunResult:
+    total_start = time.perf_counter()
     gtsam = _import_gtsam()
     _log(log_fn, f"[PythonOptimizer] Using gtsam from {Path(gtsam.__file__).resolve()}")
+
+    stage_start = time.perf_counter()
     measurements = _load_measurements(options.tum_path, options.keyframe_dir)
+    _log(
+        log_fn,
+        f"[PythonOptimizer] Loaded measurements poses={len(measurements)}, elapsed={time.perf_counter() - stage_start:.2f}s",
+    )
+
+    stage_start = time.perf_counter()
     graph_result = build_factor_graph(
         session_root=options.session_root,
         g2o_path=options.g2o_path,
         gtsam_mod=gtsam,
         log_fn=log_fn,
+    )
+    _log(
+        log_fn,
+        "[PythonOptimizer] Factor graph ready "
+        f"poses={graph_result.pose_count}, factors={int(graph_result.graph.size())}, "
+        f"elapsed={time.perf_counter() - stage_start:.2f}s",
     )
     if graph_result.pose_count != len(measurements):
         raise RuntimeError(
@@ -179,7 +196,12 @@ def run_python_optimizer(
             f"graph={graph_result.pose_count} measurements={len(measurements)}"
         )
 
+    stage_start = time.perf_counter()
     constraints = _load_constraints_csv(options.constraints_csv)
+    _log(
+        log_fn,
+        f"[PythonOptimizer] Loaded manual constraints total={len(constraints)}, elapsed={time.perf_counter() - stage_start:.2f}s",
+    )
     enabled_constraints = 0
     factor_records = list(graph_result.factor_records)
     for constraint in constraints:
@@ -231,6 +253,10 @@ def run_python_optimizer(
         )
         enabled_constraints += 1
 
+    _log(
+        log_fn,
+        f"[PythonOptimizer] Active manual constraints enabled={enabled_constraints}",
+    )
     if enabled_constraints == 0:
         _log(
             log_fn,
@@ -241,13 +267,27 @@ def run_python_optimizer(
     params = gtsam.LevenbergMarquardtParams()
     params.setMaxIterations(50)
     if hasattr(params, "setVerbosityLM"):
-        params.setVerbosityLM("SILENT")
+        params.setVerbosityLM("SUMMARY")
+    initial_error = float(graph_result.graph.error(graph_result.initial_values))
+    _log(
+        log_fn,
+        f"[PythonOptimizer] Starting LM optimize factors={int(graph_result.graph.size())}, initial_error={initial_error:.9e}",
+    )
+    stage_start = time.perf_counter()
     optimizer = gtsam.LevenbergMarquardtOptimizer(
         graph_result.graph,
         graph_result.initial_values,
         params,
     )
     optimized = optimizer.optimize()
+    optimize_elapsed = time.perf_counter() - stage_start
+    final_error = float(graph_result.graph.error(optimized))
+    _log(
+        log_fn,
+        "[PythonOptimizer] LM finished "
+        f"elapsed={optimize_elapsed:.2f}s, initial_error={initial_error:.9e}, "
+        f"final_error={final_error:.9e}, improvement={initial_error - final_error:.9e}",
+    )
 
     options.output_dir.mkdir(parents=True, exist_ok=True)
     output_g2o = options.output_dir / "pose_graph.g2o"
@@ -296,7 +336,13 @@ def run_python_optimizer(
     if options.constraints_csv.resolve() != copied_constraints.resolve():
         shutil.copyfile(options.constraints_csv, copied_constraints)
 
-    _log(log_fn, "[PythonOptimizer] Finished successfully.")
+    total_elapsed = time.perf_counter() - total_start
+    _log(
+        log_fn,
+        "[PythonOptimizer] Finished successfully "
+        f"total_elapsed={total_elapsed:.2f}s, final_error={final_error:.9e}, "
+        f"map_points={optimized_map.shape[0]}",
+    )
     return OptimizerRunResult(
         output_dir=options.output_dir,
         output_g2o=output_g2o,

@@ -10,6 +10,7 @@ import os
 import subprocess
 import shutil
 import sys
+import time
 import traceback
 from dataclasses import dataclass
 from datetime import datetime
@@ -639,11 +640,16 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self._selected_optimizer_preference = BACKEND_PREFERENCE_PYTHON
         self._cpp_optimizer_command_cache: Optional[list[str]] = None
         self._show_legacy_backend_controls = False
+        self._optimizer_started_at: Optional[float] = None
 
         self._preview_timer = QtCore.QTimer(self)
         self._preview_timer.setSingleShot(True)
         self._preview_timer.setInterval(120)
         self._preview_timer.timeout.connect(self.refresh_preview)
+
+        self._optimizer_heartbeat_timer = QtCore.QTimer(self)
+        self._optimizer_heartbeat_timer.setInterval(5000)
+        self._optimizer_heartbeat_timer.timeout.connect(self._on_optimizer_heartbeat)
 
         self._build_ui()
         self._apply_initial_window_geometry()
@@ -3789,6 +3795,9 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             backend_key = backend.key
 
         self._optimizer_process = QtCore.QProcess(self)
+        process_env = QtCore.QProcessEnvironment.systemEnvironment()
+        process_env.insert("PYTHONUNBUFFERED", "1")
+        self._optimizer_process.setProcessEnvironment(process_env)
         self._optimizer_process.setProgram(program)
         self._optimizer_process.setArguments(args)
         self._optimizer_process.readyReadStandardOutput.connect(self._read_optimizer_stdout)
@@ -3798,6 +3807,8 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self.export_button.setEnabled(False)
         self._active_optimizer_backend_name = backend_name
         self._active_optimizer_backend_key = backend_key
+        self._optimizer_started_at = time.perf_counter()
+        self._optimizer_heartbeat_timer.start()
         if fallback_note:
             self.append_log(fallback_note)
         self.append_log(
@@ -3808,6 +3819,14 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             f"optimizer backend={backend_name}."
         )
         self._optimizer_process.start()
+
+    def _on_optimizer_heartbeat(self) -> None:
+        if self._optimizer_process is None or self._optimizer_started_at is None:
+            return
+        elapsed = time.perf_counter() - self._optimizer_started_at
+        self.append_log(
+            f"Optimizer running ({self._active_optimizer_backend_name}) · elapsed={elapsed:.1f}s"
+        )
 
     def run_optimization(self) -> None:
         if self._optimizer_process is not None:
@@ -3918,10 +3937,14 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
     def _optimizer_finished(self, exit_code: int, exit_status: QtCore.QProcess.ExitStatus) -> None:
         self.optimize_button.setEnabled(True)
         self._update_session_status_widgets()
+        self._optimizer_heartbeat_timer.stop()
+        elapsed_text = ""
+        if self._optimizer_started_at is not None:
+            elapsed_text = f", elapsed={time.perf_counter() - self._optimizer_started_at:.2f}s"
         if exit_status == QtCore.QProcess.NormalExit and exit_code == 0:
             self.append_log(
                 f"Optimizer finished successfully ({self._active_optimizer_backend_name}). "
-                f"Output: {self._last_output_dir}"
+                f"Output: {self._last_output_dir}{elapsed_text}"
             )
             if self._pre_optimize_snapshot is not None:
                 self._undo_stack.append(self._pre_optimize_snapshot)
@@ -3944,6 +3967,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
                         "Python optimizer failed. Retrying once with the optional C++ backend."
                     )
                     self._optimizer_retry_attempted = True
+                    self._optimizer_heartbeat_timer.stop()
                     self._optimizer_process = None
                     backend = {
                         "key": BACKEND_PREFERENCE_CPP,
@@ -3955,12 +3979,13 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
                     return
             self.append_log(
                 f"Optimizer failed ({self._active_optimizer_backend_name}). "
-                f"exit_code={exit_code}, exit_status={int(exit_status)}"
+                f"exit_code={exit_code}, exit_status={int(exit_status)}{elapsed_text}"
             )
             self._pending_export_after_optimize = False
         self._pre_optimize_snapshot = None
         self._pending_optimizer_options = None
         self._optimizer_retry_attempted = False
+        self._optimizer_started_at = None
         self._optimizer_process = None
 
     def _apply_working_optimization_result(self) -> None:

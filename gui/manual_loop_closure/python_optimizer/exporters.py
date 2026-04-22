@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Optional
@@ -138,18 +139,34 @@ def build_optimized_map(
     log_fn: LogFn = None,
 ) -> np.ndarray:
     merged_parts: list[np.ndarray] = []
-    for measurement in measurements:
+    total_frames = len(measurements)
+    map_start = time.perf_counter()
+    for index, measurement in enumerate(measurements, start=1):
         points_xyzi = load_xyzi_points(measurement.cloud_path)
         pose = optimized_values.atPose3(gtsam_mod.Symbol("x", measurement.index).key())
         merged_parts.append(_apply_transform(points_xyzi, _pose_matrix(pose)))
+        if (
+            index == 1
+            or index == total_frames
+            or index % 250 == 0
+        ):
+            elapsed = time.perf_counter() - map_start
+            accumulated_points = sum(part.shape[0] for part in merged_parts)
+            _log(
+                log_fn,
+                "[PythonOptimizer] Map rebuild progress "
+                f"{index}/{total_frames} frames, points={accumulated_points}, elapsed={elapsed:.2f}s",
+            )
     if not merged_parts:
         return np.empty((0, 4), dtype=np.float32)
     merged = np.vstack(merged_parts)
     filtered = voxel_downsample_xyzi(merged, voxel_leaf)
+    elapsed = time.perf_counter() - map_start
     _log(
         log_fn,
         "[PythonOptimizer] Built optimized map "
-        f"input_points={merged.shape[0]}, output_points={filtered.shape[0]}, voxel={voxel_leaf:.3f}",
+        f"input_points={merged.shape[0]}, output_points={filtered.shape[0]}, "
+        f"voxel={voxel_leaf:.3f}, elapsed={elapsed:.2f}s",
     )
     return filtered
 
