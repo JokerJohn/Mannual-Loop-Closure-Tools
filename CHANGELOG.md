@@ -32,6 +32,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Added an optional `Fast ISAM2` optimize mode in `Advanced`, made it the default Python-side working-graph update path, and kept `Accurate LM` as the parity/reference solve.
+- Updated GUI/runtime documentation to explain the new optimize-mode selector, the default `TgtVoxel=0.1 m`, the default `MapVoxel=0.1 m`, and the fact that `Add` / `Replace` consume the current GICP candidate.
 - Compressed the homepage hero card again by renaming `Graph Changes` to `Graph Ops` and shortening the export call-to-action.
 - Hid the legacy C++ backend selector from the normal GUI path and kept it only for explicit developer mode while preserving automatic fallback behavior.
 - Added a one-command `make gtsam-python` / `scripts/install_gtsam_python.sh` path for installing the GTSAM 4.3 Python wrapper into the active virtual environment.

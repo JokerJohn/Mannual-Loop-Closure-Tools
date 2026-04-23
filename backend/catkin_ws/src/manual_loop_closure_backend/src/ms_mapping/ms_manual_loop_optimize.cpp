@@ -31,6 +31,7 @@ struct Options
     fs::path constraints_csv;
     fs::path output_dir;
     double map_voxel_leaf = 0.2;
+    std::string optimize_mode = "lm";
     bool skip_map_build = false;
 };
 
@@ -212,6 +213,10 @@ bool ParseArgs(int argc, char **argv, Options &options)
         {
             options.map_voxel_leaf = std::stod(value.string());
         }
+        else if (arg == "--optimize-mode")
+        {
+            options.optimize_mode = value.string();
+        }
         else
         {
             throw std::runtime_error("Unknown argument: " + arg);
@@ -239,6 +244,7 @@ void PrintUsage(const char *binary_name)
               << " --constraints-csv <manual_loop_constraints.csv>"
               << " --output-dir <manual_loop_runs/...>"
               << " [--map-voxel-leaf <meters>]"
+              << " [--optimize-mode <lm|isam2>]"
               << " [--skip-map-build]\n";
 }
 
@@ -511,6 +517,7 @@ void SaveReportJson(const fs::path &path,
     stream << "  \"constraints_csv\": \"" << options.constraints_csv.string() << "\",\n";
     stream << "  \"output_dir\": \"" << options.output_dir.string() << "\",\n";
     stream << "  \"map_voxel_leaf\": " << options.map_voxel_leaf << ",\n";
+    stream << "  \"optimize_mode\": \"" << options.optimize_mode << "\",\n";
     stream << "  \"total_constraints\": " << total_constraints << ",\n";
     stream << "  \"enabled_constraints\": " << enabled_constraints << ",\n";
     stream << "  \"optimized_pose_count\": " << measurements.size() << ",\n";
@@ -629,6 +636,19 @@ int main(int argc, char **argv)
         {
             std::cout << "[ManualLoopOptimize] No enabled manual constraints found in CSV. "
                          "Proceeding with the filtered input graph only."
+                      << std::endl;
+        }
+
+        std::string optimize_mode = options.optimize_mode;
+        std::transform(
+            optimize_mode.begin(),
+            optimize_mode.end(),
+            optimize_mode.begin(),
+            [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+        if (!optimize_mode.empty() && optimize_mode != "lm")
+        {
+            std::cout << "[ManualLoopOptimize] optimize_mode=" << options.optimize_mode
+                      << " is not supported by the legacy C++ backend. Falling back to LM."
                       << std::endl;
         }
 

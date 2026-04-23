@@ -9,7 +9,12 @@ from typing import Callable, Optional
 
 import numpy as np
 
-from manual_loop_closure.optimizer_backend import OptimizerRunOptions, OptimizerRunResult
+from manual_loop_closure.optimizer_backend import (
+    OPTIMIZE_MODE_ISAM2,
+    OPTIMIZE_MODE_LM,
+    OptimizerRunOptions,
+    OptimizerRunResult,
+)
 from manual_loop_closure.trajectory_io import load_tum_trajectory
 
 from .exporters import (
@@ -162,6 +167,65 @@ def _manual_constraint_information(constraint: ManualConstraintSpec) -> np.ndarr
     return information
 
 
+def _normalize_optimize_mode(mode: str) -> str:
+    normalized = str(mode).strip().lower()
+    if normalized == OPTIMIZE_MODE_ISAM2:
+        return OPTIMIZE_MODE_ISAM2
+    return OPTIMIZE_MODE_LM
+
+
+def _solve_graph(
+    *,
+    gtsam,
+    graph,
+    initial_values,
+    optimize_mode: str,
+    log_fn: LogFn,
+):
+    mode = _normalize_optimize_mode(optimize_mode)
+    initial_error = float(graph.error(initial_values))
+    _log(
+        log_fn,
+        f"[PythonOptimizer] Starting {mode.upper()} optimize factors={int(graph.size())}, initial_error={initial_error:.9e}",
+    )
+    stage_start = time.perf_counter()
+    if mode == OPTIMIZE_MODE_ISAM2:
+        params = gtsam.ISAM2Params()
+        if hasattr(params, "setFactorization"):
+            params.setFactorization("CHOLESKY")
+        if hasattr(params, "setRelinearizeThreshold"):
+            params.setRelinearizeThreshold(0.01)
+        if hasattr(params, "relinearizeSkip"):
+            params.relinearizeSkip = 1
+        isam = gtsam.ISAM2(params)
+        isam.update(graph, initial_values)
+        for _ in range(4):
+            isam.update()
+        optimized = isam.calculateEstimate()
+        solve_label = "ISAM2"
+    else:
+        params = gtsam.LevenbergMarquardtParams()
+        params.setMaxIterations(50)
+        if hasattr(params, "setVerbosityLM"):
+            params.setVerbosityLM("SUMMARY")
+        optimizer = gtsam.LevenbergMarquardtOptimizer(
+            graph,
+            initial_values,
+            params,
+        )
+        optimized = optimizer.optimize()
+        solve_label = "LM"
+    optimize_elapsed = time.perf_counter() - stage_start
+    final_error = float(graph.error(optimized))
+    _log(
+        log_fn,
+        f"[PythonOptimizer] {solve_label} finished "
+        f"elapsed={optimize_elapsed:.2f}s, initial_error={initial_error:.9e}, "
+        f"final_error={final_error:.9e}, improvement={initial_error - final_error:.9e}",
+    )
+    return optimized, initial_error, final_error, optimize_elapsed, mode
+
+
 def run_python_optimizer(
     options: OptimizerRunOptions,
     log_fn: LogFn = None,
@@ -264,29 +328,12 @@ def run_python_optimizer(
             "Proceeding with the filtered input graph only.",
         )
 
-    params = gtsam.LevenbergMarquardtParams()
-    params.setMaxIterations(50)
-    if hasattr(params, "setVerbosityLM"):
-        params.setVerbosityLM("SUMMARY")
-    initial_error = float(graph_result.graph.error(graph_result.initial_values))
-    _log(
-        log_fn,
-        f"[PythonOptimizer] Starting LM optimize factors={int(graph_result.graph.size())}, initial_error={initial_error:.9e}",
-    )
-    stage_start = time.perf_counter()
-    optimizer = gtsam.LevenbergMarquardtOptimizer(
-        graph_result.graph,
-        graph_result.initial_values,
-        params,
-    )
-    optimized = optimizer.optimize()
-    optimize_elapsed = time.perf_counter() - stage_start
-    final_error = float(graph_result.graph.error(optimized))
-    _log(
-        log_fn,
-        "[PythonOptimizer] LM finished "
-        f"elapsed={optimize_elapsed:.2f}s, initial_error={initial_error:.9e}, "
-        f"final_error={final_error:.9e}, improvement={initial_error - final_error:.9e}",
+    optimized, initial_error, final_error, optimize_elapsed, optimize_mode = _solve_graph(
+        gtsam=gtsam,
+        graph=graph_result.graph,
+        initial_values=graph_result.initial_values,
+        optimize_mode=options.optimize_mode,
+        log_fn=log_fn,
     )
 
     options.output_dir.mkdir(parents=True, exist_ok=True)
@@ -338,6 +385,7 @@ def run_python_optimizer(
         constraints_csv=options.constraints_csv,
         output_dir=options.output_dir,
         map_voxel_leaf=options.map_voxel_leaf,
+        optimize_mode=optimize_mode,
         total_constraints=len(constraints),
         enabled_constraints=enabled_constraints,
         optimized_pose_count=len(measurements),

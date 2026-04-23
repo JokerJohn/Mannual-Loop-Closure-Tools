@@ -29,13 +29,14 @@ python launch_gui.py --session-root /path/to/mapping_session
 4. 预览 source 和 target 点云。
 5. 运行 GICP。
 6. 新增 / 替换 / 禁用图改动。
+   点击 `Add` 或 `Replace` 后，如需继续提交新的改动，需要重新运行一次 GICP。
 7. 优化 working graph。
 8. 导出最终结果。
 
 ## 恢复旧编辑项目
 
 - `Load Session` 会恢复当前 session root 下最近一次编辑项目。
-- `Open Project` 可以通过选择某个 `project_state.json` 恢复指定历史项目。
+- `Resume Project` 可以通过选择某个 `project_state.json` 恢复指定历史项目。
 
 界面示意：
 

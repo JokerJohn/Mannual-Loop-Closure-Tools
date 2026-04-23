@@ -11,7 +11,11 @@ GUI_DIR = CURRENT_DIR.parents[1]
 if str(GUI_DIR) not in sys.path:
     sys.path.insert(0, str(GUI_DIR))
 
-from manual_loop_closure.optimizer_backend import OptimizerRunOptions  # noqa: E402
+from manual_loop_closure.optimizer_backend import (  # noqa: E402
+    OPTIMIZE_MODE_ISAM2,
+    OPTIMIZE_MODE_LM,
+    OptimizerRunOptions,
+)
 from manual_loop_closure.python_optimizer.optimizer import run_python_optimizer  # noqa: E402
 
 
@@ -25,6 +29,12 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--constraints-csv", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--map-voxel-leaf", required=False, type=float, default=0.2)
+    parser.add_argument(
+        "--optimize-mode",
+        required=False,
+        choices=(OPTIMIZE_MODE_LM, OPTIMIZE_MODE_ISAM2),
+        default=OPTIMIZE_MODE_LM,
+    )
     parser.add_argument("--skip-map-build", action="store_true")
     return parser
 
@@ -41,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
         constraints_csv=args.constraints_csv,
         output_dir=args.output_dir,
         map_voxel_leaf=float(args.map_voxel_leaf),
+        optimize_mode=str(args.optimize_mode),
         skip_map_build=bool(args.skip_map_build),
     )
     try:

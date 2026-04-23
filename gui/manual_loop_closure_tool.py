@@ -150,6 +150,8 @@ try:
     from manual_loop_closure.optimizer_backend import (  # noqa: E402
         BACKEND_PREFERENCE_CPP,
         BACKEND_PREFERENCE_PYTHON,
+        OPTIMIZE_MODE_ISAM2,
+        OPTIMIZE_MODE_LM,
         OptimizerRunOptions,
         resolve_python_optimizer_backend,
     )
@@ -790,6 +792,35 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
                 background: #bfdbfe;
                 border-color: #3b82f6;
             }
+            QPushButton[buttonRole="secondary"], QToolButton[buttonRole="secondary"] {
+                background: #f8fbff;
+                border-color: #bfd5f7;
+                color: #31527c;
+                font-weight: 600;
+            }
+            QPushButton[buttonRole="secondary"]:hover, QToolButton[buttonRole="secondary"]:hover {
+                background: #e8f1ff;
+                border-color: #93c5fd;
+                color: #1d4ed8;
+            }
+            QPushButton[buttonRole="secondary"]:pressed, QToolButton[buttonRole="secondary"]:pressed {
+                background: #dbeafe;
+                border-color: #60a5fa;
+            }
+            QPushButton[buttonRole="quiet"], QToolButton[buttonRole="quiet"] {
+                background: #ffffff;
+                border-color: #dde6f0;
+                color: #64748b;
+            }
+            QPushButton[buttonRole="quiet"]:hover, QToolButton[buttonRole="quiet"]:hover {
+                background: #f8fafc;
+                border-color: #cbd5e1;
+                color: #334155;
+            }
+            QPushButton[buttonRole="quiet"]:pressed, QToolButton[buttonRole="quiet"]:pressed {
+                background: #eef2f7;
+                border-color: #b8c6d8;
+            }
             QToolBar {
                 background: #ffffff;
                 border: 1px solid #d9e1ea;
@@ -883,6 +914,17 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
                 padding: 1px 5px;
                 font-weight: 600;
                 font-size: 10px;
+            }
+            QFrame#TrajectoryInfoStrip {
+                background: #f8fafc;
+                border: 1px solid #dde6f0;
+                border-radius: 10px;
+            }
+            QLabel#TrajectoryInfoText {
+                color: #334155;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 0px 2px;
             }
             QLabel#PanelLegend {
                 background: #f8fafc;
@@ -1156,30 +1198,50 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self.g2o_edit = QtWidgets.QLineEdit()
         browse_root_button = QtWidgets.QPushButton("Browse Root")
         browse_root_button.setToolTip("Open the session-root browser from the most recent folder.")
+        browse_root_button.setProperty("buttonRole", "quiet")
         browse_root_button.clicked.connect(self._browse_session_root)
         browse_g2o_button = QtWidgets.QPushButton("Browse G2O")
         browse_g2o_button.setToolTip("Open the g2o file browser from the most recent folder.")
+        browse_g2o_button.setProperty("buttonRole", "quiet")
         browse_g2o_button.clicked.connect(self._browse_g2o)
-        open_project_button = QtWidgets.QPushButton("Open Project")
-        open_project_button.setToolTip("Open a previous edit project by selecting its project_state.json.")
+        open_project_button = QtWidgets.QPushButton("Resume Project")
+        open_project_button.setToolTip(
+            "Restore a saved edit project directly by choosing its project_state.json."
+        )
+        open_project_button.setProperty("buttonRole", "secondary")
         open_project_button.clicked.connect(self._browse_project_state)
         load_button = QtWidgets.QPushButton("Load Session")
+        load_button.setToolTip("Load the current Session Root and G2O File fields as a new or resumed session.")
         load_button.setProperty("buttonRole", "primary")
         load_button.clicked.connect(self.load_session)
 
+        button_panel = QtWidgets.QFrame()
+        button_layout = QtWidgets.QGridLayout(button_panel)
+        button_layout.setContentsMargins(0, 0, 0, 0)
+        button_layout.setHorizontalSpacing(6)
+        button_layout.setVerticalSpacing(4)
+        button_layout.addWidget(browse_root_button, 0, 0)
+        button_layout.addWidget(browse_g2o_button, 0, 1)
+        button_layout.addWidget(open_project_button, 1, 0)
+        button_layout.addWidget(load_button, 1, 1)
+
         layout.addWidget(QtWidgets.QLabel("Session Root"), 0, 0)
-        layout.addWidget(self.session_root_edit, 0, 1, 1, 2)
-        layout.addWidget(browse_root_button, 0, 2)
+        layout.addWidget(self.session_root_edit, 0, 1)
         layout.addWidget(QtWidgets.QLabel("G2O File"), 1, 0)
         layout.addWidget(self.g2o_edit, 1, 1)
-        layout.addWidget(browse_g2o_button, 1, 2)
-        layout.addWidget(open_project_button, 1, 3)
-        layout.addWidget(load_button, 1, 4)
+        layout.addWidget(button_panel, 0, 2, 2, 1)
         layout.setColumnStretch(1, 1)
+
+        self.session_hint_label = QtWidgets.QLabel(
+            "Load Session uses the current Root + G2O. Resume Project restores a saved project_state.json."
+        )
+        self.session_hint_label.setObjectName("SubtleText")
+        self.session_hint_label.setWordWrap(True)
+        layout.addWidget(self.session_hint_label, 2, 1, 1, 2)
 
         self.session_info_label = QtWidgets.QLabel("No session loaded.")
         self.session_info_label.setWordWrap(True)
-        layout.addWidget(self.session_info_label, 2, 0, 1, 5)
+        layout.addWidget(self.session_info_label, 3, 0, 1, 3)
         return group
 
     def _build_plot_panel(self) -> QtWidgets.QGroupBox:
@@ -1244,20 +1306,34 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         segmented_layout.setSpacing(2)
         segmented_layout.addWidget(self.pick_nodes_button)
         segmented_layout.addWidget(self.pick_edges_button)
-        header_row.addWidget(segmented_control)
-        header_row.addStretch(1)
+        info_strip = QtWidgets.QFrame()
+        info_strip.setObjectName("TrajectoryInfoStrip")
+        info_layout = QtWidgets.QHBoxLayout(info_strip)
+        info_layout.setContentsMargins(8, 3, 8, 3)
+        info_layout.setSpacing(0)
+        self.trajectory_view_info_label = QtWidgets.QLabel("P0 · L0 · edit")
+        self.trajectory_view_info_label.setObjectName("TrajectoryInfoText")
+        self.trajectory_view_info_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.trajectory_view_info_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
+        info_layout.addWidget(self.trajectory_view_info_label)
+        status_strip = QtWidgets.QFrame()
+        status_layout = QtWidgets.QHBoxLayout(status_strip)
+        status_layout.setContentsMargins(0, 0, 0, 0)
+        status_layout.setSpacing(4)
         self.working_rev_badge = QtWidgets.QLabel("R0")
         self.working_rev_badge.setObjectName("StatusBadge")
-        header_row.addWidget(self.working_rev_badge)
+        status_layout.addWidget(self.working_rev_badge)
         self.session_state_badge = QtWidgets.QLabel("OK")
         self.session_state_badge.setObjectName("StatusBadge")
-        header_row.addWidget(self.session_state_badge)
+        status_layout.addWidget(self.session_state_badge)
         self.change_summary_badge = QtWidgets.QLabel("M0 D0")
         self.change_summary_badge.setObjectName("StatusBadge")
-        header_row.addWidget(self.change_summary_badge)
-        self.trajectory_view_info_label = QtWidgets.QLabel("P0 · L0 · edit")
-        self.trajectory_view_info_label.setObjectName("SubtleText")
-        header_row.addWidget(self.trajectory_view_info_label)
+        status_layout.addWidget(self.change_summary_badge)
+        header_row.addWidget(segmented_control)
+        header_row.addWidget(info_strip, 1)
+        header_row.addWidget(status_strip, 0, QtCore.Qt.AlignRight)
         layout.addLayout(header_row)
 
         self.plot_help_label = QtWidgets.QLabel("Working edits. Original compares.")
@@ -1659,8 +1735,12 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             step=0.05,
             minimum=0.0,
             maximum=5.0,
-            value=0.0,
+            value=0.1,
         )
+        self.optimize_mode_combo = QtWidgets.QComboBox()
+        self.optimize_mode_combo.addItem("Accurate LM", OPTIMIZE_MODE_LM)
+        self.optimize_mode_combo.addItem("Fast ISAM2", OPTIMIZE_MODE_ISAM2)
+        self.optimize_mode_combo.setCurrentIndex(1)
         advanced_layout_grid.addWidget(QtWidgets.QLabel("Variance T [m^2]"), 1, 0)
         advanced_layout_grid.addWidget(self.variance_t_shared_spin, 1, 1)
         advanced_layout_grid.addWidget(QtWidgets.QLabel("Variance R [rad^2]"), 2, 0)
@@ -1669,6 +1749,12 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         map_voxel_label.setToolTip("Final map export voxel size.")
         advanced_layout_grid.addWidget(map_voxel_label, 3, 0)
         advanced_layout_grid.addWidget(self.export_map_voxel_spin, 3, 1)
+        optimize_mode_label = QtWidgets.QLabel("Optimize")
+        optimize_mode_label.setToolTip(
+            "Accurate LM matches the validated offline baseline. Fast ISAM2 rebuilds the current working graph with an ISAM2 solve."
+        )
+        advanced_layout_grid.addWidget(optimize_mode_label, 4, 0)
+        advanced_layout_grid.addWidget(self.optimize_mode_combo, 4, 1)
 
         self._cpp_optimizer_command_cache = self._resolve_cpp_optimizer_command()
         self._show_legacy_backend_controls = (
@@ -1677,7 +1763,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         )
         backend_label = QtWidgets.QLabel("Backend")
         backend_label.setObjectName("SubtleText")
-        advanced_layout_grid.addWidget(backend_label, 4, 0)
+        advanced_layout_grid.addWidget(backend_label, 5, 0)
         if self._show_legacy_backend_controls:
             self.optimizer_backend_combo = QtWidgets.QComboBox()
             self.optimizer_backend_combo.addItem("Python", BACKEND_PREFERENCE_PYTHON)
@@ -1691,20 +1777,20 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
                 BACKEND_PREFERENCE_CPP: 1,
             }.get(backend_preference, 0)
             self.optimizer_backend_combo.setCurrentIndex(backend_index)
-            advanced_layout_grid.addWidget(self.optimizer_backend_combo, 4, 1)
+            advanced_layout_grid.addWidget(self.optimizer_backend_combo, 5, 1)
             backend_hint = QtWidgets.QLabel(
                 "Developer mode: legacy C++ backend selector is visible."
             )
         else:
             self.optimizer_backend_label = QtWidgets.QLabel("Python")
             self.optimizer_backend_label.setObjectName("SubtleText")
-            advanced_layout_grid.addWidget(self.optimizer_backend_label, 4, 1)
+            advanced_layout_grid.addWidget(self.optimizer_backend_label, 5, 1)
             backend_hint = QtWidgets.QLabel(
                 "Python-first path. Legacy C++ stays hidden and is only used as an automatic fallback when available."
             )
         backend_hint.setObjectName("SubtleText")
         backend_hint.setWordWrap(True)
-        advanced_layout_grid.addWidget(backend_hint, 5, 0, 1, 2)
+        advanced_layout_grid.addWidget(backend_hint, 6, 0, 1, 2)
         advanced_layout.addWidget(advanced_group)
 
         action_group = QtWidgets.QGroupBox("Actions")
@@ -1715,9 +1801,11 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self.run_gicp_button.setProperty("buttonRole", "primary")
         self.run_gicp_button.clicked.connect(self.run_gicp)
         self.accept_button = QtWidgets.QPushButton("Add")
+        self.accept_button.setProperty("buttonRole", "secondary")
         self.accept_button.clicked.connect(self.accept_constraint)
         self.accept_button.setEnabled(False)
         self.replace_edge_button = QtWidgets.QPushButton("Replace")
+        self.replace_edge_button.setProperty("buttonRole", "secondary")
         self.replace_edge_button.clicked.connect(self.replace_selected_edge)
         self.replace_edge_button.setEnabled(False)
         self.disable_edge_button = QtWidgets.QPushButton("Disable")
@@ -1725,6 +1813,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self.restore_edge_button = QtWidgets.QPushButton("Restore")
         self.restore_edge_button.clicked.connect(self.restore_selected_edge)
         self.remove_manual_button = QtWidgets.QPushButton("Remove")
+        self.remove_manual_button.setProperty("buttonRole", "quiet")
         self.remove_manual_button.clicked.connect(self.remove_selected_manual_constraint)
         self.optimize_button = QtWidgets.QPushButton("Optim")
         self.optimize_button.setProperty("buttonRole", "primary")
@@ -1733,6 +1822,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         self.export_button.setProperty("buttonRole", "primary")
         self.export_button.clicked.connect(self.export_final_result)
         self.undo_button = QtWidgets.QPushButton("Undo")
+        self.undo_button.setProperty("buttonRole", "quiet")
         self.undo_button.clicked.connect(self.undo_last_change)
         self.undo_button.setEnabled(False)
         yaw_steps_label = QtWidgets.QLabel("Yaw")
@@ -1744,6 +1834,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         auto_yaw_row_layout.addWidget(yaw_steps_label)
         auto_yaw_row_layout.addWidget(self.auto_yaw_steps_spin)
         self.auto_yaw_button.setText("Auto Yaw")
+        self.auto_yaw_button.setProperty("buttonRole", "secondary")
         auto_yaw_row_layout.addWidget(self.auto_yaw_button, 1)
         action_layout.addWidget(
             self._build_action_section(
@@ -3789,17 +3880,15 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         )
 
         self.selected_edge_ref = SelectedEdgeRef("manual_added", constraint.manual_uid)
-        self._candidate_replace_edge_uid = None
-        self.current_preview = self.last_result.preview
+        result_preview = self.last_result.preview
+        self._consume_gicp_candidate(result_preview)
         self._update_preview_summary(self.current_preview)
         self._rebuild_constraint_table()
         self._update_selection_labels()
-        self._update_edge_action_buttons()
         self._sync_constraint_table_selection()
         self._recompute_session_dirty()
         self._update_session_status_widgets()
         self._refresh_plot(preserve_view=True)
-        self.accept_button.setEnabled(False)
         self.append_log(
             f"{'Updated' if replaced else 'Accepted'} new manual edge "
             f"{constraint.target_id}->{constraint.source_id}"
@@ -3854,6 +3943,12 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             self._next_manual_uid += 1
         return constraint, replaced
 
+    def _consume_gicp_candidate(self, preview: RegistrationPreview) -> None:
+        self.current_preview = preview
+        self.last_result = None
+        self._candidate_replace_edge_uid = None
+        self._update_edge_action_buttons()
+
     def replace_selected_edge(self) -> None:
         if self.last_result is None or self._candidate_replace_edge_uid is None or self.pose_graph is None:
             self._show_error(
@@ -3907,17 +4002,15 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
         )
 
         self.selected_edge_ref = SelectedEdgeRef("manual_added", constraint.manual_uid)
-        self._candidate_replace_edge_uid = None
-        self.current_preview = self.last_result.preview
+        result_preview = self.last_result.preview
+        self._consume_gicp_candidate(result_preview)
         self._update_preview_summary(self.current_preview)
         self._recompute_session_dirty()
         self._rebuild_constraint_table()
         self._update_selection_labels()
-        self._update_edge_action_buttons()
         self._sync_constraint_table_selection()
         self._update_session_status_widgets()
         self._refresh_plot(preserve_view=True)
-        self.accept_button.setEnabled(False)
         self.append_log(
             f"{'Updated' if replaced else 'Created'} replacement for existing loop "
             f"{edge.target_id}->{edge.source_id}; working graph now uses the new manual result."
@@ -4281,6 +4374,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             f"{sum(1 for constraint in self.constraints if constraint.enabled)} manual constraints, "
             f"{len(self._active_disabled_loop_changes())} disabled loop edges, "
             f"export_map_voxel={self.export_map_voxel_spin.value():.3f} m, "
+            f"optimize_mode={self.optimize_mode_combo.currentData()}, "
             f"optimizer backend={backend_name}. "
             "Full map rebuild is deferred until Export."
         )
@@ -4376,6 +4470,7 @@ class ManualLoopClosureWindow(QtWidgets.QMainWindow):
             constraints_csv=csv_path,
             output_dir=output_dir,
             map_voxel_leaf=float(self.export_map_voxel_spin.value()),
+            optimize_mode=str(self.optimize_mode_combo.currentData()),
             skip_map_build=True,
         )
         self._last_output_dir = output_dir

@@ -36,8 +36,15 @@
 ### Advanced
 
 - 共享协方差参数
+- 优化模式选择（默认 `Fast ISAM2`，可选 `Accurate LM`）
 - backend 选择
-- 导出地图体素参数
+- 导出地图体素参数（`MapVoxel`，默认 `0.1 m`）
+
+### Registration 默认值
+
+- `TgtVoxel` 默认 `0.1 m`
+- `MapVoxel` 默认 `0.1 m`
+- `MapVoxel` 只影响最终导出，不会拖慢每次 `Optimize`
 
 ## 底部页签
 

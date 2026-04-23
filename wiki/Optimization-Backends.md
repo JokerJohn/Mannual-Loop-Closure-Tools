@@ -13,6 +13,23 @@ Why:
 - consistent integration with the PyQt + Open3D GUI
 - validated parity against the legacy C++ backend
 
+## Optimize Modes
+
+The Python backend now exposes two solve modes:
+
+- `Fast ISAM2`
+  - default in the GUI
+  - intended for repeated working-graph updates during manual editing
+- `Accurate LM`
+  - batch-style reference solve
+  - useful for parity checks or final confirmation before export
+
+In the current GUI:
+
+- `Fast ISAM2` lives in `Advanced -> Optimize`
+- `MapVoxel` also lives in `Advanced` and defaults to `0.1 m`
+- `TgtVoxel` lives in `Registration` and defaults to `0.1 m`
+
 ## Legacy C++ Fallback
 
 The C++ backend is still supported as an optional fallback.
@@ -30,6 +47,8 @@ The Python backend follows the same runtime-parameter precedence used by the leg
 1. explicit CLI / GUI options
 2. `runtime_params.yaml`
 3. validated offline defaults
+
+The legacy C++ fallback still solves with LM. If it receives `--optimize-mode isam2`, it reports the mode mismatch and falls back to LM explicitly.
 
 ## Output Files
 

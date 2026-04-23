@@ -29,13 +29,14 @@ Your session should already contain:
 4. Preview source and target clouds.
 5. Run GICP.
 6. Add / replace / disable graph changes.
+   After `Add` or `Replace`, rerun GICP before accepting another change.
 7. Optimize the working graph.
 8. Export the final result.
 
 ## Resume an Old Edit Project
 
 - `Load Session` resumes the latest edit project under the selected session root.
-- `Open Project` lets you restore a specific historical edit project by picking its `project_state.json`.
+- `Resume Project` lets you restore a specific historical edit project by picking its `project_state.json`.
 
 Session input example:
 

@@ -13,6 +13,23 @@
 - 与 PyQt + Open3D GUI 的集成更自然
 - 已与 legacy C++ backend 做过一致性验证
 
+## 优化模式
+
+Python backend 现在提供两种求解模式：
+
+- `Fast ISAM2`
+  - GUI 默认模式
+  - 适合多轮手工编辑时快速更新 working graph
+- `Accurate LM`
+  - batch 风格的参考求解
+  - 适合 parity 对照或导出前最终确认
+
+当前 GUI 中：
+
+- `Fast ISAM2` 位于 `Advanced -> Optimize`
+- `MapVoxel` 也位于 `Advanced`，默认值 `0.1 m`
+- `TgtVoxel` 位于 `Registration`，默认值 `0.1 m`
+
 ## Legacy C++ 回退后端
 
 C++ backend 仍保留为可选 fallback。
@@ -30,6 +47,8 @@ Python backend 遵循与 legacy optimizer 相同的参数优先级：
 1. 显式 CLI / GUI 参数
 2. `runtime_params.yaml`
 3. 已验证的离线默认值
+
+legacy C++ fallback 仍然使用 LM。如果收到 `--optimize-mode isam2`，会明确记录模式不匹配，并回退到 LM。
 
 ## 导出文件
 

@@ -36,8 +36,15 @@ The GUI is divided into four main areas:
 ### Advanced
 
 - shared variance settings
+- optimize mode selection (`Fast ISAM2` by default, `Accurate LM` optional)
 - backend selection
-- export map voxel
+- export map voxel (`MapVoxel`, default `0.1 m`)
+
+### Registration defaults
+
+- `TgtVoxel` defaults to `0.1 m`
+- `MapVoxel` defaults to `0.1 m`
+- `MapVoxel` affects final export only; it does not slow every optimize step
 
 ## Bottom Tabs
 

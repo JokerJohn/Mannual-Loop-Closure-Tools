@@ -23,6 +23,8 @@ Workflow:
 4. verify the result in the viewer
 5. click `Add`
 
+After `Add`, the current GICP candidate is consumed. If you change the seed, delta, or map settings, run GICP again before accepting another edit.
+
 ## Replace Existing Loop
 
 Use this when an existing loop edge is present but unreliable.
@@ -33,6 +35,8 @@ Workflow:
 2. select the existing loop
 3. run GICP from the current preview seed
 4. click `Replace`
+
+After `Replace`, the current GICP candidate is also consumed, so the button disables again until a fresh GICP run is available.
 
 Internally this keeps the original graph untouched, disables the selected existing loop in the working graph, and applies the new manual result instead.
 
@@ -65,7 +69,7 @@ This makes it possible to:
 
 - review what was changed during a manual editing session
 - reopen the latest project with `Load Session`
-- reopen a specific old project with `Open Project`
+- reopen a specific old project with `Resume Project`
 
 ## Run vs Export
 

@@ -185,6 +185,27 @@ make backend
 
 默认情况下，GUI 现在只突出 Python-first 路径；legacy C++ 选择器仅在开发者显式开启时显示。
 
+## 关键模式与参数
+
+当前最重要的几个运行时选项如下：
+
+- `Advanced` 中的 `Optimize`
+  - 默认模式是 `Fast ISAM2`，用于多轮图编辑时的快速更新。
+  - `Accurate LM` 仍保留为 batch 风格的精确参考求解。
+- `Registration` 中的 `TgtVoxel`
+  - 默认值：`0.1 m`
+  - 影响预览和 GICP 使用的 target 子图密度。
+- `Advanced` 中的 `MapVoxel`
+  - 默认值：`0.1 m`
+  - 只影响 `Export` 阶段最终全局地图的重建体素大小。
+
+建议用法：
+
+- 在反复新增、替换、禁用或恢复闭环边时，优先使用 `Fast ISAM2`
+- 在导出前或需要和 batch 基线对照时，可切回 `Accurate LM`
+- 点击 `Add` 或 `Replace` 后，当前 GICP 候选会被消费，按钮会重新灰掉
+- 如果你修改了初值、delta 或 target map 参数，需要重新运行 GICP 才能再次接受图改动
+
 ## 测试数据
 
 你可以通过下面的链接下载示例建图结果，快速验证工具流程：
@@ -216,7 +237,7 @@ make backend
 恢复逻辑：
 
 - `Load Session` 会恢复该 session 当前最新的编辑项目。
-- `Open Project` 可以通过选择某个 `project_state.json` 打开历史编辑项目。
+- `Resume Project` 可以通过选择某个 `project_state.json` 打开历史编辑项目。
 - `Optimize` 会立即更新 working graph 和优化后的 TUM，但默认不重建整张地图。
 - `Export` 会在写最终清单前按需生成 `global_map_manual_imu.pcd` 和 `trajectory.pcd`。
 - `Export` 不再复制整包优化结果，而是写一个指向目标 run 的清单。

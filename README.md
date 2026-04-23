@@ -185,6 +185,27 @@ make backend
 
 By default, the GUI now exposes only the Python-first path. The legacy C++ selector stays hidden unless a developer explicitly enables it.
 
+## Key GUI Modes and Parameters
+
+The most important runtime controls now behave as follows:
+
+- `Optimize` mode in `Advanced`
+  - `Fast ISAM2` is the default mode for interactive graph editing.
+  - `Accurate LM` remains available as the batch-style parity/reference solve.
+- `TgtVoxel` in `Registration`
+  - default: `0.1 m`
+  - affects the target submap density used for preview and GICP.
+- `MapVoxel` in `Advanced`
+  - default: `0.1 m`
+  - affects only the final exported global map rebuild during `Export`.
+
+Practical guidance:
+
+- use `Fast ISAM2` while adding, replacing, disabling, or restoring loops repeatedly
+- use `Accurate LM` when you want a direct batch-solve reference before export or parity checks
+- after `Add` or `Replace`, the current GICP candidate is consumed and the button is disabled again
+- if you adjust the seed, delta, or target-map settings, rerun GICP before accepting another graph change
+
 ## Test Data
 
 You can download a sample mapping session for quick validation here:
@@ -216,7 +237,7 @@ The tool now separates edit history, optimization outputs, and final export mani
 Resume behavior:
 
 - `Load Session` resumes the latest edit project for the selected session root.
-- `Open Project` restores a specific historical project by selecting its `project_state.json`.
+- `Resume Project` restores a specific historical project by selecting its `project_state.json`.
 - `Optimize` updates the working graph and optimized TUM immediately, but defers full map rebuilding.
 - `Export` builds `global_map_manual_imu.pcd` and `trajectory.pcd` on demand before writing the final manifest.
 - Export no longer copies the full optimized run again; it records a manifest that points to the selected run.

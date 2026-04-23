@@ -12,6 +12,8 @@ from typing import Optional
 BACKEND_PREFERENCE_AUTO = "auto"
 BACKEND_PREFERENCE_PYTHON = "python"
 BACKEND_PREFERENCE_CPP = "cpp"
+OPTIMIZE_MODE_LM = "lm"
+OPTIMIZE_MODE_ISAM2 = "isam2"
 
 
 # ===== BEGIN CHANGE: optimizer backend adapter =====
@@ -24,6 +26,7 @@ class OptimizerRunOptions:
     constraints_csv: Path
     output_dir: Path
     map_voxel_leaf: float
+    optimize_mode: str = OPTIMIZE_MODE_LM
     skip_map_build: bool = False
 
     def to_cli_args(self) -> list[str]:
@@ -42,6 +45,8 @@ class OptimizerRunOptions:
             str(self.output_dir),
             "--map-voxel-leaf",
             f"{self.map_voxel_leaf:.6f}",
+            "--optimize-mode",
+            self.optimize_mode,
         ]
         if self.skip_map_build:
             args.append("--skip-map-build")
